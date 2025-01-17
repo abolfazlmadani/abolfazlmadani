@@ -2,10 +2,10 @@ package Employees;
 
 import java.sql.*;
 import java.util.Scanner;
-public class Main
-{
-    public static void main(String[] args)
-    {
+
+public class Main {
+    public static void main(String[] args) {
+        Data_Base db = new Data_Base();
         var person = new Person();
         Scanner scanner = new Scanner(System.in);
 
@@ -17,21 +17,13 @@ public class Main
 
         //رمز رندوم ریخته میشه تو متغیر برای نمایش
         int correctPassword = person.random_password;
-        System.out.print("[password] :" + correctPassword+"\n");//نمایش رمز رندوم
-        System.out.print( "new Password :");
+        System.out.print("[password] :" + correctPassword + "\n");//نمایش رمز رندوم
+        System.out.print("new Password :");
         person.setPassword(scanner.nextInt());
-
-        // اطلاعات پایگاه داده
-        String url = "jdbc:mysql://localhost:3306/?user=root";
-        String dbUsername = "root";
-        String dbPassword = "abolfazl05";
 
         try {
             // اتصال به پایگاه داده
-            Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
-            Statement statement = connection.createStatement();
-            statement.execute("use data_employees;");
-
+            Connection connection = db.getConnection();
             // بررسی مطابقت داشتن کاربر با رمز عبور
             String sql = "SELECT password FROM employees WHERE name = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -39,8 +31,7 @@ public class Main
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // مقایسه رمز عبور ورودی با رمز عبور ذخیره شده
-            if (resultSet.next())
-            {
+            if (resultSet.next()) {
                 String storedPassword = resultSet.getString("password");
 
                 if (storedPassword.equals(password)) {
@@ -54,10 +45,9 @@ public class Main
             // بستن منابع
             resultSet.close();
             preparedStatement.close();
-            connection.close();
-        }
-        catch (Exception e)
-        {
+            db.closeConnection();
+
+        } catch (Exception e) {
             //noinspection CallToPrintStackTrace
             e.printStackTrace();
         }
